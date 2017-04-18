@@ -2,7 +2,17 @@ project('log4cpp', 'cpp', version : '1.1.1')
 
 incdir  = include_directories('include', '.')
 
-thread_dep = dependency('threads')
+
+thread_impl = get_option('LOG4CPP_USE_THREADING')
+if thread_impl == 'LOG4CPP_USE_SYSTEM_THREADS'
+  thread_dep = dependency('threads', required: true)
+elif thread_impl == 'LOG4CPP_USE_BOOSTTHREADS'
+  thread_dep = dependency('boost', modules: ['thread'], required: true)
+elif thread_impl == 'LOG4CPP_USE_NOTHREADS'
+  thread_dep = []
+else
+  error('Invalid threading option!')
+endif
 
 compiler = meson.get_compiler('cpp')
 
@@ -41,11 +51,16 @@ conf_data.set('LOG4CPP_HAVE_STDINT_H', LOG4CPP_HAVE_STDINT_H, description: 'Defi
 LOG4CPP_HAVE_IO_H = compiler.has_header('io.h')
 conf_data.set('LOG4CPP_HAVE_IO_H', LOG4CPP_HAVE_IO_H, description: 'Define if you have the <io.h> header file.')
 
-LOG4CPP_HAVE_THREADING = thread_dep.found()
-conf_data.set('LOG4CPP_HAVE_THREADING', LOG4CPP_HAVE_THREADING, description: 'define if you have threading support')
+conf_data.set('LOG4CPP_HAVE_THREADING', thread_impl == 'LOG4CPP_USE_NOTHREADS', description: 'define if you have threading support')
 
-LOG4CPP_USE_PTHREADS = compiler.has_header('pthread.h')
-conf_data.set('LOG4CPP_USE_PTHREADS', LOG4CPP_USE_PTHREADS, description: 'define if you use pthreads')
+conf_data.set('LOG4CPP_USE_BOOSTTHREADS', thread_impl == 'LOG4CPP_USE_BOOSTTHREADS', description: 'define if you use Boost threads')
+
+# Decide if system threads means pthreads or ms threads. There should be a more elegant way to do this.
+if thread_impl == 'LOG4CPP_USE_SYSTEM_THREADS'
+  LOG4CPP_HAS_PTHREADS = compiler.has_header('pthread.h')
+  conf_data.set('LOG4CPP_USE_PTHREADS', LOG4CPP_HAS_PTHREADS, description: 'define if you use pthreads')
+  conf_data.set('LOG4CPP_USE_MSTHREADS', not LOG4CPP_HAS_PTHREADS, description: 'define if you use ms threads')
+endif
 
 idsa_test = '''#include <idsa.h>
   void func() { idsa_open((char *)"test", NULL, IDSA_F_FAILOPEN); }

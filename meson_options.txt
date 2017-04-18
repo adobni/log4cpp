@@ -1,0 +1,1 @@
+option('LOG4CPP_USE_THREADING', type : 'combo', choices : ['LOG4CPP_USE_SYSTEM_THREADS','LOG4CPP_USE_BOOSTTHREADS', 'LOG4CPP_USE_NOTHREADS'], value : 'LOG4CPP_USE_SYSTEM_THREADS', description: 'Select threading implementation')
