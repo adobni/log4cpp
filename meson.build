@@ -185,5 +185,12 @@ headers = [
 
 install_headers(headers, subdir : 'log4cpp')
 
+doxygen = find_program('doxygen', required: false)
+if doxygen.found()
+  subdir('doc')
+else
+  message('Documentation disabled without doxygen')
+endif
+
 # TODO
 # subdir('tests')
