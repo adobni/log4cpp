@@ -16,6 +16,14 @@ endif
 
 compiler = meson.get_compiler('cpp')
 
+cppflags = []
+if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
+  cppflags += [
+    '-Wall',
+    '-pedantic'
+  ]
+endif
+
 sstream_test = '''#include<sstream>
 void func() { stringstream message; message << "Hello"; }
 '''
@@ -123,7 +131,12 @@ sources = [
     'src/AbortAppender.cpp'
 ]
 
-library('log4cpp', sources, include_directories: incdir, dependencies: thread_dep, install : true, install_dir : join_paths('lib', 'log4cpp'))
+library('log4cpp', sources,
+  include_directories: incdir,
+  dependencies: thread_dep,
+  install : true,
+  install_dir : join_paths('lib', 'log4cpp'),
+  cpp_args: cppflags)
 
 headers = [
   'include/log4cpp/AbortAppender.hh',
