@@ -131,7 +131,7 @@ sources = [
     'src/AbortAppender.cpp'
 ]
 
-library('log4cpp', sources,
+log4cpp_dep = library('log4cpp', sources,
   include_directories: incdir,
   dependencies: thread_dep,
   install : true,
@@ -205,5 +205,4 @@ else
   message('Documentation disabled without doxygen')
 endif
 
-# TODO
-# subdir('tests')
+subdir('tests')
