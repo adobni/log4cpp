@@ -20,6 +20,8 @@ doxyfile = configure_file(input: 'Doxyfile.in',
 
 docdir = join_paths('doc', 'log4cpp')
 
+# TODO subdir html must be copied to the build
+
 html_target = custom_target('log4cpp-docs',
                             input: [ doxyfile ],
                             output: [ 'html', 'man' ],
