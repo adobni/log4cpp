@@ -2,7 +2,6 @@ project('log4cpp', 'cpp', version : '1.1.1')
 
 incdir  = include_directories('include', '.')
 
-
 thread_impl = get_option('LOG4CPP_USE_THREADING')
 if thread_impl == 'LOG4CPP_USE_SYSTEM_THREADS'
   thread_dep = dependency('threads', required: true)
@@ -14,7 +13,18 @@ else
   error('Invalid threading option!')
 endif
 
+platform_deps = []
+
 compiler = meson.get_compiler('cpp')
+
+if host_machine.system() == 'windows'
+  platform_deps = [compiler.find_library('ws2_32')]
+endif
+
+deps = []
+deps += thread_dep
+deps += platform_deps
+
 
 cppflags = []
 if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
@@ -22,6 +32,8 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
     '-Wall',
     '-pedantic'
   ]
+elif compiler.get_id() == 'msvc'
+  cppflags += ['/Zc:inline-']
 endif
 
 sstream_test = '''#include<sstream>
@@ -133,7 +145,7 @@ sources = [
 
 log4cpp_dep = library('log4cpp', sources,
   include_directories: incdir,
-  dependencies: thread_dep,
+  dependencies: deps,
   install : true,
   install_dir : join_paths('lib', 'log4cpp'),
   cpp_args: cppflags)
