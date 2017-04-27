@@ -33,7 +33,7 @@ if compiler.get_id() == 'gcc' or compiler.get_id() == 'clang'
     '-pedantic'
   ]
 elif compiler.get_id() == 'msvc'
-  cppflags += ['/Zc:inline-']
+  cppflags += ['-DWIN32', '-DLOG4CPP_HAS_DLL','-DLOG4CPP_BUILD_DLL']
 endif
 
 sstream_test = '''#include<sstream>
